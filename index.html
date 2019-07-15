@@ -1,0 +1,78 @@
+<html>
+    <head>
+        <script>
+            let tracker;
+            let currentColour = undefined;
+            let score = 0;
+            const colours = ['RED', 'ORANGE', 'YELLOW', 'GREEN', 'BLUE', 'PURPLE', 'BLACK'];
+            const recognition = new webkitSpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = false;
+            let transcript = '';
+
+            recognition.onresult = function(event) { 
+                console.log('RECEIVED');
+
+                for (var i = event.resultIndex; i < event.results.length; ++i) {
+                    const word = event.results[i][0].transcript.toUpperCase();
+                    transcript += word;
+                    console.log(word);
+                    if(colours.indexOf(word.toUpperCase()) > -1) {
+                        const colour = colours.indexOf(word.toUpperCase());
+                        if(colour === currentColour) {
+                            score += 1;
+                            document.getElementById('result') = score;
+                        }
+                    }
+                }
+                
+             };
+
+             recognition.onerror = (event) => {
+                console.log('ERROR', event.error);
+             };
+
+             recognition.onend = () => {
+                transcript = '';
+             };
+
+
+
+
+            const getRandomInt = (max) => Math.floor(Math.random() * Math.floor(max));
+
+            const changeColor = () => {
+                const main = document.getElementById('main');
+                    main.innerHTML = colours[getRandomInt(colours.length)];
+                    currentColour = colours[getRandomInt(colours.length)];
+                    main.style.color = currentColour;
+            }
+
+            const startGame = () => {
+                recognition.start();
+                changeColor();
+                tracker = setInterval(changeColor, 5000);
+            }
+
+            const stopGame = () => {
+                clearInterval(tracker);
+                recognition.stop();
+                
+            }
+        </script>
+        <style>
+            .main {
+                font-size: 40px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Colour Game</h1>
+        <p>Say the colour of the word</p>
+        <h2 class="main" id="main">COLOUR</h2>
+        <button onclick="startGame()">Start Game</button>
+        <button onclick="stopGame()">Stop Game</button>
+        <p id="output">output</p>
+        <p id="result"></p>
+    </body>
+</html>
