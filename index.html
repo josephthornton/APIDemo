@@ -8,24 +8,29 @@
             const recognition = new webkitSpeechRecognition();
             recognition.continuous = true;
             recognition.interimResults = false;
+            recognition.lang = "en-GB";
+            recognition.language = "English";
             let transcript = '';
 
             recognition.onresult = function(event) { 
-                console.log('RECEIVED');
-
                 for (var i = event.resultIndex; i < event.results.length; ++i) {
                     const word = event.results[i][0].transcript.toUpperCase();
                     transcript += word;
                     console.log(word);
-                    if(colours.indexOf(word.toUpperCase()) > -1) {
-                        const colour = colours.indexOf(word.toUpperCase());
+                    if(colours.indexOf(word.trim().toUpperCase()) > -1) {
+                        const colour = colours[colours.indexOf(word.trim().toUpperCase())];
                         if(colour === currentColour) {
                             score += 1;
-                            document.getElementById('result') = score;
+                            
+                        } else {
+                            score = 0;
                         }
+                        document.getElementById('result').innerHTML = score;
+                        clearInterval(tracker);
+                        changeColor();
+                        tracker = setInterval(changeColor, 5000);
                     }
-                }
-                
+                }             
              };
 
              recognition.onerror = (event) => {
@@ -64,6 +69,11 @@
             .main {
                 font-size: 40px;
             }
+
+            #result {
+                font-size: 40px;
+                color: green;
+            }
         </style>
     </head>
     <body>
@@ -72,7 +82,6 @@
         <h2 class="main" id="main">COLOUR</h2>
         <button onclick="startGame()">Start Game</button>
         <button onclick="stopGame()">Stop Game</button>
-        <p id="output">output</p>
         <p id="result"></p>
     </body>
 </html>
